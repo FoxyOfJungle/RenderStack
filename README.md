@@ -37,3 +37,11 @@ view0renderStack = new RenderStack()
 ]);
 ```
 When the object does not exist in the room and the function is finished, the input from the previous one will be used naturally.
+
+Then you can get the output surface to do whatever you want, like drawing:
+```gml
+// Get input surface (the initial surface in the stack)
+var _view0Surf = application_surface; // or view_get_surface_id(0);
+// Draw final surface
+draw_surface_stretched(view0renderStack.Submit(_view0Surf), 0, 0, window_get_width(), window_get_height());
+```
