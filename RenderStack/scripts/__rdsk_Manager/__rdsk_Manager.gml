@@ -26,10 +26,10 @@ function RenderStack() constructor {
 		// redefined ordered array
 		array_resize(__renderLayersOrdered, 0);
 		// copy from effects references to the ordered array
-		var _effectsNames = struct_get_names(__renderLayers);
-		var _effectsAmount = array_length(_effectsNames);
-		for (var i = 0; i < _effectsAmount; ++i) {
-			__renderLayersOrdered[i] = __renderLayers[$ _effectsNames[i]];
+		var _layersNames = struct_get_names(__renderLayers);
+		var _layersAmount = array_length(_layersNames);
+		for (var i = 0; i < _layersAmount; ++i) {
+			__renderLayersOrdered[i] = __renderLayers[$ _layersNames[i]];
 		}
 		// do a bubble sort for the ordered array (based on stack/rendering order)
 		array_sort(__renderLayersOrdered, __layersSortFunction);
@@ -48,7 +48,7 @@ function RenderStack() constructor {
 	}
 	
 	/// @desc Add a new stack layer.
-	/// @method AddLayer(array)
+	/// @method AddLayers(array)
 	/// @param {Array<Struct.RenderStackLayer>} layer Array of stack layers. Example: [new RenderStackLayer(...), new RenderStackLayer(...)].
 	static AddLayers = function(_array) {
 		var i = 0, isize = array_length(_array), _layer = undefined;
@@ -68,6 +68,7 @@ function RenderStack() constructor {
 	static RemoveLayer = function(_name) {
 		variable_struct_remove(__renderLayers, _name);
 		__layersReorder();
+		return self;
 	}
 	
 	/// @desc Defines a new order for a layer.
@@ -77,11 +78,12 @@ function RenderStack() constructor {
 	static SetLayerOrder = function(_name, _newOrder) {
 		var _layer = __renderLayers[$ _name];
 		if (_layer == undefined) {
-			show_debug_message("Not found");
+			show_debug_message("LayerStack: Layer not found");
 			exit;
 		}
 		_layer.order = _newOrder;
 		__layersReorder();
+		return self;
 	}
 	
 	/// @desc Defines whether a layer is active or not, which causes the function to naturally be executed or not.
@@ -91,7 +93,7 @@ function RenderStack() constructor {
 	static SetLayerEnable = function(_name, _enable=-1) {
 		var _layer = __renderLayers[$ _name];
 		if (_layer == undefined) {
-			show_debug_message("Not found");
+			show_debug_message("LayerStack: Layer not found");
 			exit;
 		}
 		if (_enable == -1) {
@@ -100,6 +102,7 @@ function RenderStack() constructor {
 			_layer.enabled = _enable;
 		}
 		__layersReorder();
+		return self;
 	}
 	
 	/// @desc Defines whether the stack should execute all layers or not.
@@ -112,6 +115,7 @@ function RenderStack() constructor {
 		} else {
 			__enabled = _enable;
 		}
+		return self;
 	}
 	
 	/// @desc Get the layer struct based on the name.
@@ -160,5 +164,18 @@ function RenderStackLayer(_nameRef, _action) constructor {
 	name = _nameRef;
 	order = 0;
 	action = _action;
+	
+	/// @desc Define a new rendering order.
+	/// @method SetOrder()
+	/// @param {Real} newOrder The new order.
+	static SetOrder = function(_newOrder) {
+		order = _newOrder;
+	}
+	
+	/// @desc Returns the layer order
+	/// @method GetOrder()
+	static GetOrder = function() {
+		return order;
+	}
 }
 
