@@ -37,11 +37,9 @@ view0renderStack = new RenderStack()
 	})
 ]);
 ```
-Each function receives an input and must deliver an output as return.
+Each function receives an input and should deliver an output as return. When the object does not exist in the room and the function returns undefined, the input from the previous one will be used naturally.
 
-When the object does not exist in the room and the function is finished, the input from the previous one will be used naturally.
-
-Then you can get the output surface to do whatever you want, like drawing:
+Then you can get the final output surface to do whatever you want, like drawing:
 ```gml
 // Get input surface (the initial surface in the stack)
 var _view0Surf = application_surface; // or view_get_surface_id(0);
