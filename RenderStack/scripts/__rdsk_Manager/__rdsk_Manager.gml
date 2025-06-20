@@ -38,10 +38,14 @@ function RenderStack() constructor {
 	
 	#region Public Methods
 	
-	/// @desc Add a new stack layer.
+	/// @desc Add a new stack layer. 
 	/// @method AddLayer(layer)
 	/// @param {Struct.RenderStackLayer} layer Stack layer. Example: new RenderStackLayer(...).
-	static AddLayer = function(_layer) {
+	/// @param {Bool} automaticOrder If true, it will increment the layer order automatically.
+	static AddLayer = function(_layer, _automaticOrder=false) {
+		if (_automaticOrder) {
+			_layer.order = array_length(__renderLayersOrdered);
+		}
 		__renderLayers[$ _layer.name] = _layer;
 		__layersReorder();
 		return self;
@@ -170,6 +174,7 @@ function RenderStackLayer(_nameRef, _action) constructor {
 	/// @param {Real} newOrder The new order.
 	static SetOrder = function(_newOrder) {
 		order = _newOrder;
+		return self;
 	}
 	
 	/// @desc Returns the layer order
