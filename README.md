@@ -1,8 +1,12 @@
 # Render Stack
 
-This library is useful for organizing the game's **rendering** into a **defined** and **customizable order**, in real time.
+RenderStack library basically executes an array of sorted functions (a.k.a virtual Layers) where the `.Draw()` function receives an input, processes it, and returns an output, which would be the initial and final surface.
+
+This is useful for organizing the game's **rendering** into a **deterministic** and **customizable order**, in real time.
 
 Useful if you are using a lighting system, post-processing, pause, and transitions together, as each needs to receive input from the other to function properly.
+
+RenderStack is useful for singleplayer and local split-screen games.
 
 **RenderStack** was created with my libraries in mind ([PPFX](https://foxyofjungle.itch.io/post-processing-fx), [Crystal](https://foxyofjungle.itch.io/crystal-2d-lighting-engine), Transitions), but it can be used for other things (like your own things - following the RenderStack logic).
 
@@ -10,39 +14,43 @@ https://github.com/user-attachments/assets/044265e7-bc2a-4145-9097-01dfbe1d6308
 
 # How to use it
 
+Create Event:
 ```gml
-// Create a render stack (you need one for each viewport - we will only use one here)
-view0renderStack = new RenderStack()
+// Create a render stack for viewport 0 and add functionality to it
+// (you need one for each viewport - we will only use one here)
+renderStack[0] = new RenderStack();
+viewportSurfacesOutput = []; // array with final output surface from each viewport
 
-// Add functionality to it. The order of addition is the order of execution by default, but you can use .SetLayerOrder(), .SetLayerEnable() and others to stop executing something on the fly, etc
-.AddLayers([
-	new RenderStackLayer("Lighting", function(_input) {
-		if (!instance_exists(objLightingManager)) exit;
-		return objLightingManager.renderer.Draw(_input, view_get_camera(0));
-	}),
-	
-	new RenderStackLayer("PPFX", function(_input) {
-		if (!instance_exists(objPostProcessing)) exit;
-		return objPostProcessing.renderer.Draw(_input);
-	}),
-	
-	new RenderStackLayer("UI", function(_input) {
-		if (!manager.IsAuxGUIEnabled()) exit;
-		return manager.AuxGUIRender(_input);
-	}),
-	
-	new RenderStackLayer("Pause", function(_input) {
-		if (!instance_exists(objPause)) exit;
-		return objPause.Draw(_input);
-	})
-]);
+// Add a layer to the render stack, this is doing nothing, but it should renderize something and return the output surface
+renderStack[0].AddLayer(new RenderStackLayer("sameInput", undefined, function(_input) {
+	show_debug_message(_input);
+	return _input;
+}));
+
+// Example:
+renderStack[0].AddLayer(new RenderStackLayer("PPFX", undefined, function(_input) {
+	return ppfxRenderer.DrawInFullscreen(_input);
+}));
 ```
-Each function receives an input and should deliver an output as return. When the object does not exist in the room and the function returns undefined, the input from the previous one will be used naturally.
 
-Then you can get the final output surface to do whatever you want, like drawing:
+Pre-Draw:
 ```gml
-// Get input surface (the initial surface in the stack)
-var _view0Surf = application_surface; // or view_get_surface_id(0);
+// Reset our array with surfaces references
+// This is useful if you're changing active viewports in real time (to clean the reference to old viewport surfaces)
+array_resize(viewportSurfacesOutput, 0);
+```
+
+Draw End:
+```gml
+// Draw End is called for each viewport, so we're going to renderize it for each viewport and get the final surface from each viewport
+viewportSurfacesOutput[view_current] = renderStack[view_current].Render(surface_get_target());
+```
+
+Post-Draw:
+```gml
 // Draw final surface
-draw_surface_stretched(view0renderStack.Submit(_view0Surf), 0, 0, window_get_width(), window_get_height());
+draw_surface_stretched(viewportSurfacesOutput[0], 0, 0, window_get_width(), window_get_height());
+
+// Or, if using Rezol Library:
+screen.DrawInFullscreen(viewportSurfacesOutput);
 ```

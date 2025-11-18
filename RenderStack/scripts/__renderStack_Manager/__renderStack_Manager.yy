@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__rdsk_Manager",
+  "%Name":"__renderStack_Manager",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__rdsk_Manager",
+  "name":"__renderStack_Manager",
   "parent":{
     "name":"RenderStack",
     "path":"folders/KazanGames/RenderStack.yy",

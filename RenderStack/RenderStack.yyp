@@ -2,7 +2,7 @@
   "$GMProject":"v1",
   "%Name":"RenderStack",
   "AudioGroups":[
-    {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
+    {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
   "configs":{
     "children":[],
@@ -22,7 +22,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.13.1.193",
+    "IDEVersion":"2024.14.0.207",
   },
   "name":"RenderStack",
   "resources":[
@@ -30,7 +30,7 @@
     {"id":{"name":"objLightingManager","path":"objects/objLightingManager/objLightingManager.yy",},},
     {"id":{"name":"objPostProcessing","path":"objects/objPostProcessing/objPostProcessing.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
-    {"id":{"name":"__rdsk_Manager","path":"scripts/__rdsk_Manager/__rdsk_Manager.yy",},},
+    {"id":{"name":"__renderStack_Manager","path":"scripts/__renderStack_Manager/__renderStack_Manager.yy",},},
     {"id":{"name":"sprSquaresBackground","path":"sprites/sprSquaresBackground/sprSquaresBackground.yy",},},
   ],
   "resourceType":"GMProject",

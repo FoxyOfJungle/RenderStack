@@ -1,10 +1,10 @@
 
 // Feather ignore all
 
-#macro RDSK_VERSION "v1.0"
-#macro RDSK_RELEASE_DATE "June, 21, 2025"
+#macro RENDERSTACK_VERSION "v1.0"
+#macro RENDERSTACK_RELEASE_DATE "November, 18, 2025"
 
-show_debug_message($"RenderStack {RDSK_VERSION} | Copyright (C) 2025 FoxyOfJungle");
+show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2025 FoxyOfJungle");
 
 
 /// @desc Creates a stack containing layers, which are functions to be executed in a specific order. If using split-screen, you will create one for each viewport.
@@ -37,15 +37,11 @@ function RenderStack() constructor {
 	#endregion
 	
 	#region Public Methods
-	
 	/// @desc Add a new stack layer. 
 	/// @method AddLayer(layer)
 	/// @param {Struct.RenderStackLayer} layer Stack layer. Example: new RenderStackLayer(...).
-	/// @param {Bool} automaticOrder If true, it will increment the layer order automatically.
-	static AddLayer = function(_layer, _automaticOrder=false) {
-		if (_automaticOrder) {
-			_layer.order = array_length(__renderLayersOrdered);
-		}
+	static AddLayer = function(_layer) {
+		if (_layer.order == undefined) _layer.order = array_length(__renderLayersOrdered);
 		__renderLayers[$ _layer.name] = _layer;
 		__layersReorder();
 		return self;
@@ -58,7 +54,7 @@ function RenderStack() constructor {
 		var i = 0, isize = array_length(_array), _layer = undefined;
 		repeat(isize) {
 			_layer = _array[i];
-			_layer.order = i;
+			if (_layer.order == undefined) _layer.order = max(i, array_length(__renderLayersOrdered));
 			__renderLayers[$ _layer.name] = _layer;
 			++i;
 		}
@@ -129,16 +125,17 @@ function RenderStack() constructor {
 		return __renderLayers[$ _name];
 	}
 	
-	/// @desc Gets the output of the last layer. Useful to use as input for drawing.
+	/// @desc Gets the output of the last layer. Useful to use as input for drawing in Post-Draw event.
 	/// @method GetOutput()
 	/// @param {String} name The name of the layer to get struct.
 	static GetOutput = function() {
 		return __output;
 	}
 	
-	/// @desc Executes all layers based on the defined order. Also returns the output of the last layer.
-	/// @method Submit()
-	static Submit = function(_input) {
+	/// @desc Executes all layers based on the defined order.
+	/// Also returns the output of the last layer - So you can draw it in Post-Draw event.
+	/// @method Render()
+	static Render = function(_input) {
 		__output = _input;
 		if (__enabled) {
 			var i = 0, isize = array_length(__renderLayersOrdered), _layer = undefined;
@@ -161,12 +158,13 @@ function RenderStack() constructor {
 
 /// @desc Responsible for defining the function to be executed and its execution order.
 /// @param {String} nameRef The reference name, used to find the layer later.
+/// @param {Real} order This is the order that the function will be executed. That it, this will define the rendering order.
 /// @param {Function,Method} action The function or method to execute when submiting.
-function RenderStackLayer(_nameRef, _action) constructor {
+function RenderStackLayer(_nameRef, _order, _action) constructor {
 	// Properties
 	enabled = true;
 	name = _nameRef;
-	order = 0;
+	order = _order;
 	action = _action;
 	
 	/// @desc Define a new rendering order.
