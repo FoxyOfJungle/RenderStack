@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/044265e7-bc2a-4145-9097-01dfbe1d6308
 # How to use it
 
 Create Event:
-```gml
+```js
 // Create a render stack for viewport 0 and add functionality to it
 // (you need one for each viewport - we will only use one here)
 renderStack[0] = new RenderStack();
@@ -34,20 +34,20 @@ renderStack[0].AddLayer(new RenderStackLayer("PPFX", undefined, function(_input)
 ```
 
 Pre-Draw:
-```gml
+```js
 // Reset our array with surfaces references
 // This is useful if you're changing active viewports in real time (to clean the reference to old viewport surfaces)
 array_resize(viewportSurfacesOutput, 0);
 ```
 
 Draw End:
-```gml
+```js
 // Draw End is called for each viewport, so we're going to renderize it for each viewport and get the final surface from each viewport
 viewportSurfacesOutput[view_current] = renderStack[view_current].Render(surface_get_target());
 ```
 
 Post-Draw:
-```gml
+```js
 // Draw final surface
 draw_surface_stretched(viewportSurfacesOutput[0], 0, 0, window_get_width(), window_get_height());
 
