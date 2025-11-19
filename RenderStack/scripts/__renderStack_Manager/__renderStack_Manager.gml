@@ -1,7 +1,7 @@
 
 // Feather ignore all
 
-#macro RENDERSTACK_VERSION "v1.0"
+#macro RENDERSTACK_VERSION "v1.1"
 #macro RENDERSTACK_RELEASE_DATE "November, 18, 2025"
 
 show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2025 FoxyOfJungle");
@@ -158,7 +158,7 @@ function RenderStack() constructor {
 
 /// @desc Responsible for defining the function to be executed and its execution order.
 /// @param {String} nameRef The reference name, used to find the layer later.
-/// @param {Real} order This is the order that the function will be executed. That it, this will define the rendering order.
+/// @param {Real} order This is the order that the function will be executed. That it, this will define the rendering order. Use undefined to automatically set the order in ascending order (separated by 100).
 /// @param {Function,Method} action The function or method to execute when submiting.
 function RenderStackLayer(_nameRef, _order, _action) constructor {
 	// Properties
