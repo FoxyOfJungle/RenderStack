@@ -41,7 +41,7 @@ function RenderStack() constructor {
 	/// @method AddLayer(layer)
 	/// @param {Struct.RenderStackLayer} layer Stack layer. Example: new RenderStackLayer(...).
 	static AddLayer = function(_layer) {
-		if (_layer.order == undefined) _layer.order = array_length(__renderLayersOrdered);
+		if (_layer.order == undefined) _layer.order = array_length(__renderLayersOrdered) * 100;
 		__renderLayers[$ _layer.name] = _layer;
 		__layersReorder();
 		return self;
@@ -54,7 +54,7 @@ function RenderStack() constructor {
 		var i = 0, isize = array_length(_array), _layer = undefined;
 		repeat(isize) {
 			_layer = _array[i];
-			if (_layer.order == undefined) _layer.order = max(i, array_length(__renderLayersOrdered));
+			if (_layer.order == undefined) _layer.order = max(i, array_length(__renderLayersOrdered)) * 100;
 			__renderLayers[$ _layer.name] = _layer;
 			++i;
 		}

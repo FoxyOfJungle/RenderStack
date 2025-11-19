@@ -15,4 +15,15 @@ renderStack[0].AddLayer(new RenderStackLayer("sameInput", undefined, function(_i
 	return _input;
 }));
 
+renderStack[0].AddLayer(new RenderStackLayer("Lighting", undefined, function(_input) {
+	return _input;
+}));
+
+renderStack[0].AddLayer(new RenderStackLayer("PPFX", undefined, function(_input) {
+	return _input;
+}));
+
+
 //renderStack[0].RemoveLayer("sameInput");
+
+//show_debug_message(json_stringify(renderStack, true));
