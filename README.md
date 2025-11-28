@@ -27,9 +27,10 @@ renderStack[0].AddLayer(new RenderStackLayer("sameInput", undefined, function(_i
 	return _input;
 }));
 
-// Example:
+// Example (using Post-Processing FX in the rendering pipeline):
 renderStack[0].AddLayer(new RenderStackLayer("PPFX", undefined, function(_input) {
-	return ppfxRenderer.DrawInFullscreen(_input);
+	if (instance_exists(objPostProcessing)) _input = objPostProcessing.renderer.Render(_input);
+	return _input;
 }));
 ```
 
@@ -41,6 +42,7 @@ array_resize(viewportSurfacesOutput, 0);
 ```
 
 Draw End:
+(RenderStack will always be rendering stuff on Draw End - and draw in Post-Draw only)
 ```js
 // Draw End is called for each viewport, so we're going to renderize it for each viewport and get the final surface from each viewport
 viewportSurfacesOutput[view_current] = renderStack[view_current].Render(surface_get_target());
@@ -51,6 +53,6 @@ Post-Draw:
 // Draw final surface
 draw_surface_stretched(viewportSurfacesOutput[0], 0, 0, window_get_width(), window_get_height());
 
-// Or, if using Rezol Library:
+// Or, if using Rezol Library (Recommended):
 screen.DrawInFullscreen(viewportSurfacesOutput);
 ```
