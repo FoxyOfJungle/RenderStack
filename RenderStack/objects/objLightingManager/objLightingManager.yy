@@ -6,8 +6,8 @@
   "name":"objLightingManager",
   "overriddenProperties":[],
   "parent":{
-    "name":"Objects",
-    "path":"folders/Example/Objects.yy",
+    "name":"Rendering",
+    "path":"folders/Example/Objects/Managers/Graphics/Rendering.yy",
   },
   "parentObjectId":null,
   "persistent":false,

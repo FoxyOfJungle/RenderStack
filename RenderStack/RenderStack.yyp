@@ -12,6 +12,9 @@
   "Folders":[
     {"$GMFolder":"","%Name":"Example","folderPath":"folders/Example.yy","name":"Example","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Objects","folderPath":"folders/Example/Objects.yy","name":"Objects","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Managers","folderPath":"folders/Example/Objects/Managers.yy","name":"Managers","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Graphics","folderPath":"folders/Example/Objects/Managers/Graphics.yy","name":"Graphics","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Rendering","folderPath":"folders/Example/Objects/Managers/Graphics/Rendering.yy","name":"Rendering","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Example/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Example/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"KazanGames","folderPath":"folders/KazanGames.yy","name":"KazanGames","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -22,13 +25,14 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.0.207",
+    "IDEVersion":"2024.14.1.210",
   },
   "name":"RenderStack",
   "resources":[
     {"id":{"name":"objDisplayManager","path":"objects/objDisplayManager/objDisplayManager.yy",},},
     {"id":{"name":"objLightingManager","path":"objects/objLightingManager/objLightingManager.yy",},},
     {"id":{"name":"objPostProcessing","path":"objects/objPostProcessing/objPostProcessing.yy",},},
+    {"id":{"name":"objRenderPipelineManager","path":"objects/objRenderPipelineManager/objRenderPipelineManager.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
     {"id":{"name":"__renderStack_Manager","path":"scripts/__renderStack_Manager/__renderStack_Manager.yy",},},
     {"id":{"name":"sprSquaresBackground","path":"sprites/sprSquaresBackground/sprSquaresBackground.yy",},},
