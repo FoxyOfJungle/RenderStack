@@ -1,184 +1,78 @@
 
 // Feather ignore all
+#macro RENDERSTACK_VERSION "v2.0"
+#macro RENDERSTACK_RELEASE_DATE "December, 14, 2025"
 
-#macro RENDERSTACK_VERSION "v1.1"
-#macro RENDERSTACK_RELEASE_DATE "November, 18, 2025"
+show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2026 FoxyOfJungle");
 
-show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2025 FoxyOfJungle");
+global.__currentRenderStackManager = undefined;
 
+/// @ignore
+/// @func __renderstack_trace(text)
+/// @param {String} text
+function __renderstack_trace(_text, _level=1) {
+	gml_pragma("forceinline");
+	if (_level <= RENDERSTACK_CFG_TRACE_LEVEL) show_debug_message($"# RenderStack >> {_text}");
+}
 
-/// @desc Creates a stack containing layers, which are functions to be executed in a specific order. If using split-screen, you will create one for each viewport.
-function RenderStack() constructor {
-	// Copyright (C) 2025, Mozart Junior (FoxyOfJungle)
-	__renderLayers = {}; // unordered references
-	__renderLayersOrdered = []; // ordered references
-	__enabled = true;
-	__output = undefined;
+/// @desc This class is responsible for facilitating the rendering of render stacks for each viewport.
+/// The idea is that, for each viewport, a render stack (containing layers) is rendered, executing its layers in the defined order, and finally, this manager returns the array with the final surfaces of each viewport (.GetFinalViewportSurfaces()).
+/// NOTE: RenderStack does not create surfaces in any way; it is only an input/output processor.
+function RenderStack_Manager() constructor {
+	renderStacks = []; // each position is a viewport
+	viewportFinalSurfaces = [];
 	
-	#region Private Methods
-	/// @ignore
-	static __layersSortFunction = function(a, b) {
-		return a.order - b.order;
-	}
+	global.__currentRenderStackManager = self;
 	
-	/// @ignore
-	static __layersReorder = function() {
-		// redefined ordered array
-		array_resize(__renderLayersOrdered, 0);
-		// copy from effects references to the ordered array
-		var _layersNames = struct_get_names(__renderLayers);
-		var _layersAmount = array_length(_layersNames);
-		for (var i = 0; i < _layersAmount; ++i) {
-			__renderLayersOrdered[i] = __renderLayers[$ _layersNames[i]];
-		}
-		// do a bubble sort for the ordered array (based on stack/rendering order)
-		array_sort(__renderLayersOrdered, __layersSortFunction);
-	}
-	#endregion
-	
-	#region Public Methods
-	/// @desc Add a new stack layer. 
-	/// @method AddLayer(layer)
-	/// @param {Struct.RenderStackLayer} layer Stack layer. Example: new RenderStackLayer(...).
-	static AddLayer = function(_layer) {
-		if (_layer.order == undefined) _layer.order = array_length(__renderLayersOrdered) * 100;
-		__renderLayers[$ _layer.name] = _layer;
-		__layersReorder();
-		return self;
-	}
-	
-	/// @desc Add a new stack layer.
-	/// @method AddLayers(array)
-	/// @param {Array<Struct.RenderStackLayer>} layer Array of stack layers. Example: [new RenderStackLayer(...), new RenderStackLayer(...)].
-	static AddLayers = function(_array) {
-		var i = 0, isize = array_length(_array), _layer = undefined;
-		repeat(isize) {
-			_layer = _array[i];
-			if (_layer.order == undefined) _layer.order = max(i, array_length(__renderLayersOrdered)) * 100;
-			__renderLayers[$ _layer.name] = _layer;
-			++i;
-		}
-		__layersReorder();
-		return self;
-	}
-	
-	/// @desc Remove a layer from the stack.
-	/// @method RemoveLayer(_name)
-	/// @param {String} name The name of the layer to remove. This naturally causes the function to stop executing.
-	static RemoveLayer = function(_name) {
-		variable_struct_remove(__renderLayers, _name);
-		__layersReorder();
-		return self;
-	}
-	
-	/// @desc Defines a new order for a layer.
-	/// @method SetLayerOrder(_name, newOrder)
-	/// @param {String} name The name of the layer to reorder.
-	/// @param {Real} name The new layer order.
-	static SetLayerOrder = function(_name, _newOrder) {
-		var _layer = __renderLayers[$ _name];
-		if (_layer == undefined) {
-			show_debug_message("LayerStack: Layer not found");
-			exit;
-		}
-		_layer.order = _newOrder;
-		__layersReorder();
-		return self;
-	}
-	
-	/// @desc Defines whether a layer is active or not, which causes the function to naturally be executed or not.
-	/// @method SetLayerEnable(_name, enable)
-	/// @param {String} name The name of the layer to enable/disable/toggle.
-	/// @param {Bool} enable Define if the layer is enabled. Use -1 to toggle.
-	static SetLayerEnable = function(_name, _enable=-1) {
-		var _layer = __renderLayers[$ _name];
-		if (_layer == undefined) {
-			show_debug_message("LayerStack: Layer not found");
-			exit;
-		}
-		if (_enable == -1) {
-			_layer.enabled = !_layer.enabled;
+	/// @desc Adds a RenderStack to the internal array of render stacks, where the index corresponds to which viewport the render stack will be rendered.
+	/// So, for example, if you use this function once, it will correspond to viewport 0, and the next time, viewport 1, etc. Unless you explicitly define which viewport the render stack will run on.
+	/// @method AddToViewport(renderStack, viewport)
+	static AddToViewport = function(_renderStack, _viewport=undefined) {
+		if (_viewport == undefined) {
+			array_push(renderStacks, _renderStack);
 		} else {
-			_layer.enabled = _enable;
+			renderStacks[_viewport] = _renderStack;
 		}
-		__layersReorder();
-		return self;
 	}
 	
-	/// @desc Defines whether the stack should execute all layers or not.
-	/// @method SetEnable(enable)
-	/// @param {String} name The name of the layer to enable/disable/toggle.
-	/// @param {Bool} enable Define if the layer is enabled. Use -1 to toggle.
-	static SetEnable = function(_enable=-1) {
-		if (_enable == -1) {
-			__enabled = !__enabled;
-		} else {
-			__enabled = _enable;
-		}
-		return self;
+	/// @desc Reset internal array with surfaces references.
+	/// This is useful if you're changing active viewports in real time (to clean the reference to old viewport surfaces).
+	/// NOTE: Must be called in "Pre-Draw" event.
+	/// @method Reset()
+	static Reset = function() {
+		array_resize(viewportFinalSurfaces, 0);
 	}
 	
-	/// @desc Get the layer struct based on the name.
-	/// @method GetLayer(_name)
-	/// @param {String} name The name of the layer to get struct.
-	static GetLayer = function(_name) {
-		return __renderLayers[$ _name];
+	/// @desc For each viewport, call the .Render() function from each added RenderStack.
+	/// The output of the surfaces can be obtained using .GetOutputSurfaces().
+	/// NOTE: Must be called in "Draw End" event. "Draw End" is called for each viewport, so we're going to renderize it for each viewport and get the final surface from each viewport
+	static Render = function() {
+		var _surf = view_get_surface_id(view_current);
+		viewportFinalSurfaces[view_current] = renderStacks[clamp(view_current, 0, array_length(renderStacks)-1)].Render(surface_exists(_surf) ? _surf : application_surface);
 	}
 	
-	/// @desc Gets the output of the last layer. Useful to use as input for drawing in Post-Draw event.
-	/// @method GetOutput()
-	/// @param {String} name The name of the layer to get struct.
-	static GetOutput = function() {
-		return __output;
+	/// @desc Returns the array with the final surfaces references, so you can draw them with draw_surface or using "Rezol" library to draw it.
+	/// @method GetFinalViewportSurfaces()
+	static GetFinalViewportSurfaces = function() {
+		return viewportFinalSurfaces;
 	}
 	
-	/// @desc Executes all layers based on the defined order.
-	/// Also returns the output of the last layer - So you can draw it in Post-Draw event.
-	/// @method Render()
-	static Render = function(_input) {
-		__output = _input;
-		if (__enabled) {
-			var i = 0, isize = array_length(__renderLayersOrdered), _layer = undefined;
-			repeat(isize) {
-				_layer = __renderLayersOrdered[i];
-				if (_layer.enabled) {
-					__output = _layer.action(_input) ?? _input;
-					_input = __output;
-				} else {
-					__output = _input;
-				}
-				++i;
+	/// @method DebugDraw(x, y)
+	/// @param {Real} x The x position to debug draw info.
+	/// @param {Real} y The y position to debug draw info.
+	static DebugDraw = function(_x, _y) {
+		var _renderStack, _viewportX, _viewportY, _array, _item;
+		for (var i = 0; i < array_length(renderStacks); ++i) {
+			_renderStack = renderStacks[i];
+			_viewportX = _x+i*150;
+			_viewportY = _y;
+			draw_text(_viewportX, _y, $"RenderStack\nviewport: {i}");
+			
+			_array = _renderStack.__renderLayers;
+			for (var j = 0; j < array_length(_array); ++j) {
+				_item = _array[j];
+				draw_text(_viewportX, _viewportY+50+j*20, $"Layer Order: {_item.order}");
 			}
 		}
-		return __output;
-	}
-	#endregion
-}
-
-
-/// @desc Responsible for defining the function to be executed and its execution order.
-/// @param {String} nameRef The reference name, used to find the layer later.
-/// @param {Real} order This is the order that the function will be executed. That it, this will define the rendering order. Use undefined to automatically set the order in ascending order (separated by 100).
-/// @param {Function,Method} action The function or method to execute when submiting.
-function RenderStackLayer(_nameRef, _order, _action) constructor {
-	// Properties
-	enabled = true;
-	name = _nameRef;
-	order = _order;
-	action = _action;
-	
-	/// @desc Define a new rendering order.
-	/// @method SetOrder()
-	/// @param {Real} newOrder The new order.
-	static SetOrder = function(_newOrder) {
-		order = _newOrder;
-		return self;
-	}
-	
-	/// @desc Returns the layer order
-	/// @method GetOrder()
-	static GetOrder = function() {
-		return order;
 	}
 }
-

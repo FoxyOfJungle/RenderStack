@@ -9,8 +9,8 @@
   "name":"objDisplayManager",
   "overriddenProperties":[],
   "parent":{
-    "name":"Graphics",
-    "path":"folders/Example/Objects/Managers/Graphics.yy",
+    "name":"Display",
+    "path":"folders/Example/Objects/Managers/Display.yy",
   },
   "parentObjectId":null,
   "persistent":true,

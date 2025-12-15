@@ -1,5 +1,7 @@
 # Render Stack
 
+RenderStack is an input/output processor, mainly for rendering.
+
 RenderStack library basically executes an array of sorted functions (a.k.a virtual Layers) where the `.Draw()` function receives an input, processes it, and returns an output, which would be the initial and final surface.
 
 This is useful for organizing the game's **rendering** into a **deterministic** and **customizable order**, in real time.
@@ -14,45 +16,71 @@ https://github.com/user-attachments/assets/044265e7-bc2a-4145-9097-01dfbe1d6308
 
 # How to use it
 
-Create Event:
-```js
-// Create a render stack for viewport 0 and add functionality to it
-// (you need one for each viewport - we will only use one here)
-renderStack[0] = new RenderStack();
-viewportSurfacesOutput = []; // array with final output surface from each viewport
+**CREATE EVENT:**  
 
-// Add a layer to the render stack, this is doing nothing, but it should renderize something and return the output surface
-renderStack[0].AddLayer(new RenderStackLayer("sameInput", undefined, function(_input) {
-	show_debug_message(_input);
-	return _input;
-}));
+Ideally, you should create a `RenderStack_Manager()` that will handle the tedious process for you.
 
-// Example (using Post-Processing FX in the rendering pipeline):
-renderStack[0].AddLayer(new RenderStackLayer("PPFX", undefined, function(_input) {
-	if (instance_exists(objPostProcessing)) _input = objPostProcessing.renderer.Render(_input);
-	return _input;
-}));
+The idea behind this manager is to: render all renderers for each viewport and return the final surface for that viewport. For each viewport you have, you will create a RenderStack, which is the set of virtual layers.
+```
+manager = new RenderStack_Manager();
+manager.AddToViewport(new RenderStack(), 0); // Add a render stack for viewport 0
 ```
 
-Pre-Draw:
-```js
-// Reset our array with surfaces references
-// This is useful if you're changing active viewports in real time (to clean the reference to old viewport surfaces)
-array_resize(viewportSurfacesOutput, 0);
+</br>
+
+
+**PRE-DRAW EVENT**
+
+Now, to ensure that the viewport surface references are automatically reset when you add or remove viewports, it's advisable to reset the array in the Pre-Draw event of the same object (`objRenderingManager`):
+
+```gml
+manager.Reset();
 ```
 
-Draw End:
-(RenderStack will always be rendering stuff on Draw End - and draw in Post-Draw only)
-```js
-// Draw End is called for each viewport, so we're going to renderize it for each viewport and get the final surface from each viewport
-viewportSurfacesOutput[view_current] = renderStack[view_current].Render(surface_get_target());
+> This is useful if you're changing active viewports in real time (to clean the reference to old viewport surfaces).
+
+</br>
+
+
+**DRAW END EVENT:**  
+
+The Draw End event is executed for each viewport, just like the normal Draw event; which means this will work naturally if your game is single player or split-screen.
+
+Therefore, we will do it this way:
+
+```gml
+manager.Render();
+```
+Internally, this is what happens _(DO NOT USE THIS CODE - THIS IS JUST AN EXPLANATION)_:
+
+```gml
+var _rawGameSurface = view_get_surface_id(view_current);
+var _finalOutputSurface = renderStacks[view_current)].Render(_rawGameSurface);
+viewportFinalSurfaces[view_current] = _finalOutputSurface;
 ```
 
-Post-Draw:
+What this code does?
+
+The `.Render()` function from each `RenderStack`:  
+- 1 - Receives the viewport surface as the first input surface *(basically the raw surface with the content already drawn in the normal Draw events, the "application_surface")*;  
+- 2 - Executes the functions loop internally, and  
+- 3 - Returns the final output surface for the viewport.  
+
+The input surface will be used as a base for our complex renderers (Crystal, PPFX etc) to use as input and return an output, which will be used as input for the next renderer, and so on.
+
+Our `viewportFinalSurfaces` variable is the final surfaces array from viewports. (You will use `manager.GetFinalViewportSurfaces()` to get this).
+
+We will use this variable next.
+
+> **NOTE: RenderStack DOESN'T CREATE SURFACES! IT'S JUST AN INPUT/OUTPUT PROCESSOR.**
+
+</br>
+
+**Post-Draw:**
 ```js
 // Draw final surface
-draw_surface_stretched(viewportSurfacesOutput[0], 0, 0, window_get_width(), window_get_height());
+draw_surface_stretched(manager.GetFinalViewportSurfaces()[0], 0, 0, window_get_width(), window_get_height());
 
 // Or, if using Rezol Library (Recommended):
-screen.DrawInFullscreen(viewportSurfacesOutput);
+screen.DrawInFullscreen(manager.GetFinalViewportSurfaces());
 ```

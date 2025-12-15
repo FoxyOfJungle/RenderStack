@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__renderStack_Settings",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__renderStack_Settings",
+  "parent":{
+    "name":"RenderStack",
+    "path":"folders/KazanGames/RenderStack.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

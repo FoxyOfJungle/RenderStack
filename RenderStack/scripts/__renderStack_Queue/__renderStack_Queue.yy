@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__renderStack_Manager",
+  "%Name":"__renderStack_Queue",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__renderStack_Manager",
+  "name":"__renderStack_Queue",
   "parent":{
     "name":"Core",
     "path":"folders/KazanGames/RenderStack/Core.yy",

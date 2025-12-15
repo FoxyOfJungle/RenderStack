@@ -1,13 +1,16 @@
 {
   "$GMObject":"",
   "%Name":"objLightingManager",
-  "eventList":[],
+  "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"objLightingManager",
   "overriddenProperties":[],
   "parent":{
     "name":"Rendering",
-    "path":"folders/Example/Objects/Managers/Graphics/Rendering.yy",
+    "path":"folders/Example/Objects/Managers/Rendering.yy",
   },
   "parentObjectId":null,
   "persistent":false,
