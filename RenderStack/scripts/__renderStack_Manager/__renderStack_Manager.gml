@@ -1,9 +1,9 @@
 
 // Feather ignore all
 #macro RENDERSTACK_VERSION "v2.0"
-#macro RENDERSTACK_RELEASE_DATE "December, 14, 2025"
+#macro RENDERSTACK_RELEASE_DATE "December, 15, 2025"
 
-show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2026 FoxyOfJungle");
+show_debug_message($"RenderStack {RENDERSTACK_VERSION} | Copyright (C) 2026 Mozart Junior (@foxyofjungle)");
 
 global.__currentRenderStackManager = undefined;
 
